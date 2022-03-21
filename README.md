@@ -3,14 +3,20 @@ caddyfwd
 
 Wraps `caddy` for even easier SSL forwarding.
 
-### Requirements
-
-* caddy
-* jq
-
 ### Usage
 
-Simple forward to `localhost:11111`.
+```
+./caddyfwd [<listen_host>[:<listen_port>]] <upstream_host>[:<upstream_port>]
+```
+
+### Requirements
+
+* [caddy](https://caddyserver.com)
+* [jq](https://stedolan.github.io/jq/)
+
+### Examples
+
+#### Simple forward to `localhost:11111`
 
 ```
 $ ./caddyfwd localhost:11111
@@ -19,7 +25,7 @@ Proxying localhost:443 -> localhost:11111
 2022/03/21 14:14:50.646	INFO	serving initial configuration
 ```
 
-Simple forward when `www.example.org` is mapped in your `/etc/hosts`.
+#### Simple forward when `www.example.org` is mapped in your `/etc/hosts`
 
 ```
 $ ./caddyfwd www.example.org localhost:11111
@@ -28,7 +34,7 @@ Proxying www.example.org:443 -> localhost:11111
 2022/03/21 14:15:29.379	INFO	serving initial configuration
 ```
 
-Mapping to a weird port and a nice check of your `/etc/hosts`:
+### Mapping to a weird port and a nice check of your `/etc/hosts`
 
 ```
 ./caddyfwd www.example.net:38522 localhost:11111
