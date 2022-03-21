@@ -11,7 +11,7 @@ Wraps `caddy` for even easier SSL forwarding.
 
 ### Requirements
 
-* [caddy](https://caddyserver.com)
+* [caddy](https://caddyserver.com) and `caddy trust`
 * [jq](https://stedolan.github.io/jq/)
 
 ### Examples
