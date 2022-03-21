@@ -1,7 +1,7 @@
 caddyfwd
 ========
 
-Wraps `caddy` for even easier SSL forwarding.
+SSL forwarding (powered by `caddy`) with arbitrary hostnames.
 
 ### Usage
 
