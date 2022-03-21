@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+
+SELF_SIGNED_CONFIG='{"admin":{"disabled":true},"apps":{"http":{"servers":{"proxy":{"listen":[":{{PORT}}"],"routes":[{"handle":[{"handler":"reverse_proxy","transport":{"protocol":"http"},"upstreams":[{"dial":"{{FORWARD_HOST}}:{{FORWARD_PORT}}"}]}],"match":[{"host":["{{HOST}}"]}]}]}}},"tls":{"automation":{"policies":[{"issuers":[{"module":"internal"}],"subjects":["{{HOST}}"]}]}}}}'
+
+DEFAULT_HOST=localhost
+DEFAULT_PORT=443
+DEFAULT_HOSTPORT=localhost:443
+DEFAULT_FORWARD_HOST=localhost
+DEFAULT_FORWARD_PORT=8080
+DEFAULT_FORWARD_HOSTPORT=localhost:8080
+
+render_config() {
+    local host=$1
+    local port=$2
+    local forward_host=$3
+    local forward_port=$4
+
+    echo ${SELF_SIGNED_CONFIG} \
+        | sed -e 's,{{HOST}},'${host}',g' \
+        | sed -e 's,{{PORT}},'${port}',g' \
+        | sed -e 's,{{FORWARD_HOST}},'${forward_host}',g' \
+        | sed -e 's,{{FORWARD_PORT}},'${forward_port}',g' \
+        | jq . \
+        ;
+}
+
+save_tmp_config() {
+    tmp=$(mktemp)
+    render_config $@ >> $tmp
+    echo $tmp
+}
+
+hostport_get_host() {
+    local hostport=$1
+    host=$(echo $1 | awk -F: '{print $1}')
+    echo $host
+}
+
+hostport_get_port() {
+    local hostport=$1
+    port=$(echo $1 | awk -F: '{print $2}')
+    echo $port
+}
+
+main() {
+    if [ $# -eq 1 ]; then
+        hostport=
+        forward_hostport=$1
+    else
+        hostport=$1
+        forward_hostport=$2
+    fi
+
+    if [ -z "${hostport}" ]; then
+        hostport=${DEFAULT_HOSTPORT}
+    fi
+
+    if [ -z "${forward_hostport}" ]; then
+        forward_hostport=${DEFAULT_FORWARD_HOSTPORT}
+    fi
+
+    host=$(hostport_get_host $hostport)
+    if [ -z "${host}" ]; then
+        host=${DEFAULT_HOST}
+    fi
+
+    port=$(hostport_get_port $hostport)
+    if [ -z "${port}" ]; then
+        port=${DEFAULT_PORT}
+    fi
+
+    forward_host=$(hostport_get_host $forward_hostport)
+    if [ -z "${forward_host}" ]; then
+        forward_host=${DEFAULT_FORWARD_HOST}
+    fi
+
+    forward_port=$(hostport_get_port $forward_hostport)
+    if [ -z "${forward_port}" ]; then
+        forward_port=${DEFAULT_FORWARD_PORT}
+    fi
+
+    if [ -z "$(grep ${host} /etc/hosts)" ]; then
+        echo "warning: ${host} missing from /etc/hosts" >&2
+    fi
+
+    echo "Proxying ${host}:${port} -> ${forward_host}:${forward_port}"
+    tmp=$(save_tmp_config $host $port $forward_host $forward_port)
+    caddy run $tmp
+    rm -f $tmp
+}
+
+main $@
