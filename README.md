@@ -34,7 +34,7 @@ Proxying www.example.org:443 -> localhost:11111
 2022/03/21 14:15:29.379	INFO	serving initial configuration
 ```
 
-### Mapping to a weird port and a nice check of your `/etc/hosts`
+#### Mapping to a weird port and a nice check of your `/etc/hosts`
 
 ```
 ./caddyfwd www.example.net:38522 localhost:11111
