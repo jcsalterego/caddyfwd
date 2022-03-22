@@ -85,7 +85,7 @@ main() {
 
     echo "Proxying ${host}:${port} -> ${forward_host}:${forward_port}"
     tmp=$(save_tmp_config $host $port $forward_host $forward_port)
-    caddy run $tmp
+    caddy run --config $tmp
     rm -f $tmp
 }
 
