@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-SELF_SIGNED_CONFIG='{"admin":{"disabled":true},"apps":{"http":{"servers":{"proxy":{"listen":[":{{PORT}}"],"routes":[{"handle":[{"handler":"reverse_proxy","transport":{"protocol":"http"},"upstreams":[{"dial":"{{FORWARD_HOST}}:{{FORWARD_PORT}}"}]}],"match":[{"host":["{{HOST}}"]}]}]}}},"tls":{"automation":{"policies":[{"issuers":[{"module":"internal"}],"subjects":["{{HOST}}"]}]}}}}'
+SELF_SIGNED_CONFIG='{"admin":{"disabled":true},"apps":{"http":{"servers":{"proxy":{"automatic_https":{"disable_redirects":true},"listen":[":{{PORT}}"],"routes":[{"handle":[{"handler":"reverse_proxy","transport":{"protocol":"http"},"upstreams":[{"dial":"{{FORWARD_HOST}}:{{FORWARD_PORT}}"}]}],"match":[{"host":["{{HOST}}"]}]}]}}},"tls":{"automation":{"policies":[{"issuers":[{"module":"internal"}],"subjects":["{{HOST}}"]}]}}}}'
 
 DEFAULT_HOST=localhost
 DEFAULT_PORT=443
